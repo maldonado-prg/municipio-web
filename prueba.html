@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Prueba de Noticias</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      color: #0d47a1;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 1rem;
+    }
+
+    .card h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.2rem;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .card small {
+      display: block;
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Noticias desde la API</h1>
+  <div class="cards" id="news-list">Cargando noticias...</div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const container = document.getElementById('news-list');
+
+      try {
+        const res = await fetch('http://localhost:3001/api/news');
+        const newsList = await res.json();
+
+        if (!res.ok) {
+          container.innerHTML = `<p style="color:red;">Hubo un error al cargar las noticias.</p>`;
+          return;
+        }
+
+        if (newsList.length === 0) {
+          container.innerHTML = `<p>No hay noticias aún.</p>`;
+          return;
+        }
+
+        container.innerHTML = '';
+
+        newsList.forEach(noticia => {
+          container.innerHTML += `
+            <div class="card">
+              <h3>${noticia.title}</h3>
+              <p>${noticia.content.substring(0, 100)}${noticia.content.length > 100 ? '...' : ''}</p>
+              <small>Autor: ${noticia.author} | Fecha: ${new Date(noticia.created_at).toLocaleDateString()}</small>
+            </div>
+          `;
+        });
+
+      } catch (err) {
+        container.innerHTML = `<p style="color:red;">No se pudieron cargar las noticias. (${err.message})</p>`;
+        console.error(err);
+      }
+    });
+  </script>
+
+</body>
+</html>
